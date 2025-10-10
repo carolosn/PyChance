@@ -20,3 +20,4 @@ It’s a fun, logic-based project designed to showcase control flow, randomness,
    ```bash
    git clone https://github.com/YOUR_USERNAME/PyChance.git
    cd PyChance
+python main.py
