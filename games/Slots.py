@@ -3,8 +3,7 @@ import random
 symbols = ["🍒", "💎", "7️⃣"]
 points = 0
 
-def play_slots():
-    global points
+def play_slots(points):
     print("\n--- SLOT MACHINE ---")
     s1 = random.choice(symbols)
     s2 = random.choice(symbols)
@@ -22,10 +21,12 @@ def play_slots():
         print("No match. -5 points")
 
     print(f"Total Points: {points}")
+    return points
+
 
 while True:
-    choice = input("\nPress ENTER to spin or type 'quit' to exit: ").lower()
-    if choice == "quit":
+    choice = input("\nPress ENTER to spin or type 'quit' to exit: ")
+    if choice.lower() == "quit":
         print("\nThanks for playing!")
         break
-    play_slots()
+    points = play_slots(points)
