@@ -1,6 +1,6 @@
 import random
 
-symbols = ["🍒", "💎", "7️⃣"]
+symbols = ["🍒", "💎",️ "💰"]
 points = 0
 
 def play_slots(points):
