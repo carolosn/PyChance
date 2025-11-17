@@ -1,60 +1,106 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PhyChance Login</title>
-
+    <title>PyChance Login</title>
     <style>
         body {
-            background: white;
-            font-family: Arial, sans-serif;
-            text-align: left;
-            padding: 40px;
-            color: black;
+            margin: 0;
+            height: 100vh;
+            background: black;
+            font-family: 'Lucida Sans', sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .user-points {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            text-align: right;
+            font-size: 18px;
         }
 
         h1 {
-            font-size: 32px;
-            margin-bottom: 20px;
+            font-size: 36px;
+            margin-bottom: 40px;
+            text-align: center;
         }
 
-        .section-title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-top: 25px;
+        .login-container {
+            background: #111;
+            padding: 40px 30px;
+            border-radius: 12px;
+            text-align: center;
         }
 
         input {
             display: block;
-            margin-top: 5px;
-            margin-bottom: 15px;
             width: 250px;
-            padding: 8px;
+            margin: 10px auto;
+            padding: 10px;
             font-size: 16px;
+            border-radius: 6px;
+            border: none;
         }
 
-        .points-box {
-            margin-top: 30px;
-            font-size: 20px;
+        button {
+            margin-top: 15px;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            background: white;
+            color: black;
         }
 
+        button:hover {
+            background: black;
+            color: white;
+            border: 1px solid white;
+        }
     </style>
 </head>
 <body>
 
-    <h1>PhyChance</h1>
-
-    <div class="section-title">Login:</div>
-
-    <label>Username:</label>
-    <input type="text">
-
-    <label>Password:</label>
-    <input type="password">
-
-    <div class="points-box">
-        PhyChance User: <span id="username"></span><br>
+    <div class="user-points">
+        User: <span id="username">---</span><br>
         Points: <span id="points">0</span>
     </div>
+
+    <h1>PyChance</h1>
+
+    <div class="login-container">
+        <label>Username:</label>
+        <input type="text" id="usernameInput">
+
+        <label>Password:</label>
+        <input type="password" id="passwordInput">
+
+        <button onclick="login()">Login</button>
+    </div>
+
+    <script>
+        let points = 0;
+
+        function login() {
+            const username = document.getElementById('usernameInput').value;
+            const password = document.getElementById('passwordInput').value;
+
+            if(username && password) {
+                document.getElementById('username').innerText = username;
+                points = 0;
+                document.getElementById('points').innerText = points;
+                alert(`Welcome, ${username}!`);
+            } else {
+                alert('Please enter both username and password.');
+            }
+        }
+    </script>
 
 </body>
 </html>
