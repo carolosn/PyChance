@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Slots</title>
+</head>
+<body>
+
+<h1>Slot Machine</h1>
+
+<div id="slots">
+    <span id="s1">?</span>
+    <span id="s2">?</span>
+    <span id="s3">?</span>
+</div>
+
+<button onclick="spin()">Spin</button>
+
+<p id="result"></p>
+
+<script>
+function spin() {
+    const symbols = ["🍒", "⭐", "🍋", "🍉"];
+    let s1 = symbols[Math.floor(Math.random() * symbols.length)];
+    let s2 = symbols[Math.floor(Math.random() * symbols.length)];
+    let s3 = symbols[Math.floor(Math.random() * symbols.length)];
+
+    document.getElementById("s1").textContent = s1;
+    document.getElementById("s2").textContent = s2;
+    document.getElementById("s3").textContent = s3;
+
+    if (s1 === s2 && s2 === s3) {
+        document.getElementById("result").innerText = "Jackpot!";
+        confetti();
+    } else {
+        document.getElementById("result").innerText = "Try again";
+    }
+}
+</script>
+
+</body>
+</html>
