@@ -1,72 +1,75 @@
-{% extends "base.html" %}
-{% block content %}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PhyChance</title>
 <style>
     body {
         margin: 0;
-        font-family: Arial, sans-serif;
-        background-color: #000;
-        color: #fff;
+        font-family: "Inter", sans-serif;
+        background: #050505;
+        color: #d9ffe7;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
     }
 
     header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 15px 30px;
-        border-bottom: 2px solid #fff;
+        padding: 18px 30px;
+        box-sizing: border-box;
     }
 
-    header h1 {
-        font-style: italic;
-        margin: 0;
+    .logo {
+        font-size: 42px;
+        font-weight: 700;
+        color: #00ff99;
+        letter-spacing: 1px;
+        text-shadow: 0 0 10px #00ff99;
     }
 
-    .top-right input {
-        margin-left: 10px;
-        padding: 5px;
-        border-radius: 5px;
-        border: 1px solid #000;
+    .user-info {
+        text-align: right;
+        font-size: 17px;
+        color: #9effd1;
     }
 
     main {
-        padding: 30px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 30px 0;
     }
 
     .games-container {
         display: flex;
         justify-content: center;
-        gap: 30px;
-        margin-top: 30px;
+        gap: 25px;
+        flex-wrap: wrap;
+        margin-top: 20px;
     }
 
     .game-card {
-        background-color: #fff;
-        color: #000;
+        background: rgba(20, 20, 20, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(0, 255, 140, 0.15);
+        box-shadow: 0 0 25px rgba(0, 255, 120, 0.15);
+        border-radius: 18px;
         width: 200px;
         height: 250px;
-        border-radius: 15px;
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
         align-items: center;
-        cursor: pointer;
-        transition: transform 0.2s, box-shadow 0.2s;
+        justify-content: flex-start;
         text-align: center;
-        padding: 10px;
-        overflow: hidden;
+        padding: 12px;
+        cursor: pointer;
+        transition: 0.25s;
         text-decoration: none;
+        color: #d9ffe7;
     }
 
     .game-card:hover {
         transform: scale(1.05);
-        box-shadow: 0 0 15px #fff;
+        box-shadow: 0 0 25px #00ff99;
     }
 
     .game-card img {
@@ -74,62 +77,68 @@
         height: 150px;
         object-fit: cover;
         border-radius: 10px;
+        margin-bottom: 10px;
     }
-</style>
-</head>
 
-<body>
+    .contact-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #00ff99;
+            color: black;
+            padding: 12px 18px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 255, 140, 0.4);
+            transition: 0.25s;
+            z-index: 1000;
+        }
+
+        .contact-btn:hover {
+            background: #29ffb3;
+            transform: scale(1.05);
+        }
+    
+</style>
+<!-- Contact Button -->
+<a href="mailto:can'thelpyousupport@pychance.com" class="contact-btn">Need Help?</a>
 
 <header>
-    <h1>PhyChance</h1>
-    <div class="top-right">
-        Points: <input type="text" id="points" value="0" readonly>
-        User: <input type="text" id="username" placeholder="Enter name">
+    <div class="logo">PyChance</div>
+    <div class="user-info">
+        Points: <span id="points">0</span><br>
+        User: <span id="username">---</span>
     </div>
 </header>
 
 <main>
-    <h2><em>Homepage:</em></h2>
+    <h2 style="margin-bottom:30px;">Games:</h2>
     <div class="games-container">
 
         <!-- COINFLIP -->
         <a class="game-card" href="{{ url_for('coinflip_page') }}">
-            <p><em>Coin Flip</em></p>
             <img src="https://1b-f.s3.eu-west-1.amazonaws.com/a/146196-A15C1B6A-D5AE-41A2-9C20-912324FA259B-0-1598508964.gif" alt="Coin Flip">
-
+            <p><em>Coin Flip</em></p>
         </a>
 
         <!-- ROULETTE -->
         <a class="game-card" href="/roulette">
-            <p><em>Roulette</em></p>
             <img src="https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUydGxkemZ2eG9uMXNpN3NzeW1kdWUxMXhoOGFtNm56Zml6a3kxM2RvayZlcD12MV9naWZzX3NlYXJjaCZjdD1n/26uf2YTgF5upXUTm0/200w.gif" alt="Roulette">
-
+            <p><em>Roulette</em></p>
         </a>
 
         <!-- SLOTS -->
         <a class="game-card" href="/slots">
-            <p><em>Slots</em></p>
             <img src="https://media4.giphy.com/media/v1.Y2lkPTZjMDliOTUyczl3bjRjYW04b2JibzFsMGhiNndrend0b3RmbW92a2RnMXJmdW4xbiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/EahYBxGgJHLZ6/giphy.gif" alt="Slots">
+            <p><em>Slots</em></p>
         </a>
 
     </div>
 </main>
 
 <script>
-    function playGame(gameName) {
-        let username = document.getElementById('username').value || "Player";
-        let pointsInput = document.getElementById('points');
-        let points = parseInt(pointsInput.value) || 0;
-
-        alert(`${username} is playing ${gameName}!`);
-
-        let earned = Math.floor(Math.random() * 10) + 1;
-        points += earned;
-        pointsInput.value = points;
-    }
+    document.getElementById('username').textContent = "Player1"; // replace with dynamic value
+    document.getElementById('points').textContent = 50; // replace with dynamic value
 </script>
 
-</body>
-</html>
-
-{% endblock %}
