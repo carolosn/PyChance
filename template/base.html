@@ -8,8 +8,25 @@
 </head>
 <body>
   <header class="site-header">
-    <div class="logo"><a href="{{ url_for('home') }}">PyChance</a></div>
+    <div class="logo">
+      <a href="{{ url_for('home') }}">PyChance</a>
+    </div>
+
+    <!-- NEW NAVBAR LINKS -->
+    <nav class="main-nav">
+      <a href="{{ url_for('games') }}">Games</a>
+      <a href="{{ url_for('about') }}">About</a>
+      <a href="{{ url_for('help_page') }}">Help</a>
+      <a href="{{ url_for('contact') }}">Contact</a>
+      <a href="{{ url_for('wallet') }}">Wallet</a>
+    </nav>
+
     <div class="user-area">
+      <!-- NEW BALANCE DISPLAY -->
+      <span class="balance">
+        Balance: ${{ "%.2f"|format(current_balance) }}
+      </span>
+
       {% if user %}
         <span>Hi, {{ user.username }}</span>
         <a href="{{ url_for('logout') }}" class="btn small">Logout</a>
@@ -32,3 +49,4 @@
   {% block scripts %}{% endblock %}
 </body>
 </html>
+
