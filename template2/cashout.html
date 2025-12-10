@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PyChance - Cash Out</title>
+<link rel="stylesheet" href="static/style.css">
+<style>
+  body {
+    font-family: "Inter", sans-serif;
+    background: #050505;
+    color: #d9ffe7;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 30px;
+  }
+
+  .logo {
+    font-size: 32px;
+    font-weight: bold;
+    color: #00ff99;
+  }
+
+  .menu-container {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #00ff99;
+    color: #050505;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .menu-links {
+    display: none;
+    flex-direction: column;
+    margin-top: 5px;
+  }
+
+  .menu-links a {
+    text-decoration: none;
+    color: #d9ffe7;
+    padding: 4px 0;
+  }
+
+  .user-info {
+    text-align: right;
+  }
+
+  .back-home {
+    margin-top: 10px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    background: #00ff99;
+    color: #050505;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .cashout-container {
+    margin-top: 50px;
+    background: #111;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+  }
+
+  .cashout-container input {
+    width: 60px;
+    padding: 6px 10px;
+    margin-right: 10px;
+    border-radius: 6px;
+    border: 1px solid #00ff99;
+    background: #111;
+    color: #d9ffe7;
+    font-size: 16px;
+  }
+
+  .cashout-container button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    background: #00ff99;
+    color: #050505;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .cashout-container button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  #message {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #fff;
+  }
+
+  .history-container {
+    margin-top: 30px;
+    background: #111;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+  }
+
+  .history-container h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #00ff99;
+  }
+
+  .history-container ul {
+    list-style: none;
+    padding-left: 0;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .history-container li {
+    padding: 6px 0;
+    border-bottom: 1px solid #00ff99;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">PyChance</div>
+
+  <!-- Menu below logo -->
+  <div class="menu-container">
+    <button class="menu-button" onclick="toggleMenu()">Menu</button>
+    <div class="menu-links" id="menuLinks">
+      <a href="homepage.html">Home</a>
+      <a href="cashout.html">Cash Out</a>
+      <a href="about.html">About</a>
+    </div>
+  </div>
+
+  <div class="user-info">
+    User: <span id="usernameDisplay"></span><br>
+    Points: <span id="pointsDisplay"></span><br>
+  </div>
+</header>
+
+<div class="cashout-container">
+  <h2>Cash Out Points</h2>
+  <p>Your Points: <span id="pointsCurrent"></span></p>
+  <p>Cash Equivalent: $<span id="cashAmount"></span></p>
+
+  <label>Points to cash out:</label>
+  <input type="number" id="pointsToCash" min="1" placeholder="0">
+  <button id="cashOutBtn">Cash Out</button>
+
+  <p id="message"></p>
+</div>
+
+<div class="history-container">
+  <h3>Cash Out History</h3>
+  <ul id="cashHistory"></ul>
+</div>
+
+<script>
+  const username = localStorage.getItem("username") || "Player1";
+  let points = parseInt(localStorage.getItem("points") || 25);
+
+  const usernameDisplay = document.getElementById("usernameDisplay");
+  const pointsDisplay = document.getElementById("pointsDisplay");
+  const pointsCurrent = document.getElementById("pointsCurrent");
+  const cashAmount = document.getElementById("cashAmount");
+  const pointsInput = document.getElementById("pointsToCash");
+  const cashOutBtn = document.getElementById("cashOutBtn");
+  const message = document.getElementById("message");
+  const cashHistoryList = document.getElementById("cashHistory");
+
+  // Load history from localStorage
+  let cashHistory = JSON.parse(localStorage.getItem("cashHistory_" + username)) || [];
+
+  function updateUI() {
+    usernameDisplay.textContent = username;
+    pointsDisplay.textContent = points;
+    pointsCurrent.textContent = points;
+    cashAmount.textContent = (points * 0.25 / 100).toFixed(2);
+    renderHistory();
+  }
+
+  function renderHistory() {
+    cashHistoryList.innerHTML = "";
+    if(cashHistory.length === 0){
+      const li = document.createElement("li");
+      li.textContent = "No cash outs yet.";
+      cashHistoryList.appendChild(li);
+      return;
+    }
+    cashHistory.slice().reverse().forEach(item => {
+      const li = document.createElement("li");
+      li.textContent = `${item.points} pts → $${item.cash} (${item.time})`;
+      cashHistoryList.appendChild(li);
+    });
+  }
+
+  pointsInput.addEventListener("input", () => {
+    const val = parseInt(pointsInput.value);
+    cashOutBtn.disabled = !val || val < 1 || val > points;
+  });
+
+  cashOutBtn.addEventListener("click", () => {
+    const cashOutPoints = parseInt(pointsInput.value);
+    if (!cashOutPoints || cashOutPoints < 1 || cashOutPoints > points) return;
+
+    const cashValue = (cashOutPoints * 0.25 / 100).toFixed(2);
+
+    points -= cashOutPoints;
+    localStorage.setItem("points", points);
+    updateUI();
+
+    // Save history
+    const timestamp = new Date().toLocaleString();
+    cashHistory.push({points: cashOutPoints, cash: cashValue, time: timestamp});
+    localStorage.setItem("cashHistory_" + username, JSON.stringify(cashHistory));
+
+    message.textContent = `You cashed out ${cashOutPoints} points for $${cashValue}!`;
+    pointsInput.value = "";
+    cashOutBtn.disabled = true;
+  });
+
+  function toggleMenu() {
+    const menu = document.getElementById("menuLinks");
+    menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+  }
+
+  updateUI();
+</script>
+
+</body>
+</html>
