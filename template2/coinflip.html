@@ -74,7 +74,6 @@
     <div class="user-info">
         User: <span id="usernameDisplay"></span><br>
         Points: <span id="pointsDisplay"></span>
-        
     </div>
 </header>
 
@@ -93,7 +92,7 @@
 
         <div id="coin" class="coin">
             <div class="side heads">HEADS</div>
-            <div class="side tails">TAILS</div>
+            <div class="side tails">Tails</div>
         </div>
 
         <div style="display:flex; gap:10px; justify-content:center;">
@@ -101,7 +100,6 @@
             <button onclick="setGuess('Tails')" disabled>Tails</button>
         </div>
 
-        <!-- Bet section below animation -->
         <div class="bet-container">
             <input type="number" id="betAmount" min="1" placeholder="Enter bet" oninput="checkBet()">
             <button onclick="flipCoin()">Flip Coin</button>
@@ -113,23 +111,22 @@
         <p id="roundDisplay">Round: 0 / 5</p>
         <p id="gameMessage" style="font-weight:bold; color:#ffffff;"></p>
 
-        <!-- Rules Box -->
-        <div class="rules-box">
-            <h4>Rules</h4>
-            <p>Your opponent is the Computer</p>
-            <p>You have 5 chances to win against it.</p>
-            <p>Place a bet before each flip.</p>
-            <p>If you win more rounds than the Computer, you get all bet points.</p>
-            <p>If you lose, the bet is deducted from your points.</p>
-            <p>This game is based on chance only.</p>
-            <p>Good luck!</p>
-        </div>
+           <div class="rules-box">
+        <h4>Rules</h4>
+        <p>Your opponent is the Computer</p>
+        <p>You have 5 chances to win against it.</p>
+        <p>If your guess is right, you win bet points.</p>
+        <p>If wrong, you lose bet points.</p>
+        <p>At the end of the 5 chances, if the Computer's guess is more than yours, Computer wins.</p>
+        <p>If Computer wins, all accumulated points are lost.</p>
+        <p>This game is based on chance only.</p>
+        <p>Good luck!</p>
+    </div>
 
-        <!-- Back Button -->
+
         <a href="homepage.html" class="back">Back</a>
     </div>
 
-    <!-- History Box -->
     <div class="history">
         <h3>Gaming History</h3>
         <ul id="coinHistory"></ul>
@@ -150,25 +147,11 @@ let points = parseInt(localStorage.getItem("points") || 50);
 document.getElementById('usernameDisplay').textContent = currentUser;
 document.getElementById('pointsDisplay').textContent = points;
 
-// Update points in real-time
-function updateUserInfo() {
-    currentUser = localStorage.getItem("pychance_user") || "Player1";
-    points = parseInt(localStorage.getItem("points") || 50);
-    document.getElementById("usernameDisplay").textContent = currentUser;
-    document.getElementById("pointsDisplay").textContent = points;
-}
-setInterval(updateUserInfo, 1000);
-
-// Modify points helper
-function changePoints(amount) {
-    points += amount;
-    if (points < 0) points = 0;
-    localStorage.setItem("points", points);
-    updateUserInfo();
-}
 // Game variables
 let coinWins = 0, computerWins = 0, round = 0;
-let userGuess = null, maxRounds = 5, bet = 0, totalRoundPoints = 0;
+let userGuess = null, maxRounds = 5, bet = 0;
+let wonBets = []; // store bets for rounds the user won
+let allBets = []; // store all bets for all rounds
 const guessButtons = document.querySelectorAll('#coinflipView button[onclick^="setGuess"]');
 const betInput = document.getElementById('betAmount');
 
@@ -187,9 +170,10 @@ function setGuess(choice){
 
 function flipCoin() {
     if(!bet || bet <= 0) return alert("Enter a valid bet amount!");
-    if(bet > points) return alert("Not enough points!");
     if(!userGuess) return alert("Pick Heads or Tails!");
     if(round >= maxRounds) return alert("Game over. Click Restart.");
+
+    allBets.push(bet); // track every bet
 
     const coin = document.getElementById('coin');
     const result = Math.random() < 0.5 ? "Heads" : "Tails";
@@ -205,19 +189,16 @@ function flipCoin() {
         coin.classList.remove("flip-animate");
         coin.style.transform = result === "Heads" ? "rotateY(0deg)" : "rotateY(180deg)";
 
-        let roundPoints = 0;
         let roundMsg = "";
         if(userGuess === result){
             coinWins++;
-            roundPoints = bet;
+            wonBets.push(bet); // store the bet since user won this round
             confetti({ particleCount: 100, spread: 70, origin: {y:0.6} });
-            roundMsg = `You won this round! +${roundPoints} pts`;
+            roundMsg = `You won this round! Bet: ${bet} pts`;
         } else {
             computerWins++;
-            roundPoints = -bet;
-            roundMsg = `Computer won this round. -${bet} pts`;
+            roundMsg = `Computer won this round. Bet: ${bet} pts`;
         }
-        totalRoundPoints += roundPoints;
 
         round++;
         document.getElementById('coinResult').textContent = `Coin: ${result} | Computer: ${computerChoice}`;
@@ -226,27 +207,37 @@ function flipCoin() {
         document.getElementById('roundDisplay').textContent = `Round: ${round} / ${maxRounds}`;
         document.getElementById('gameMessage').textContent = roundMsg;
 
-        addHistory('coinHistory', 'Coin Flip', result, roundPoints, userGuess, computerChoice);
+        addHistory('coinHistory', 'Coin Flip', result, userGuess === result ? bet : -bet, userGuess, computerChoice);
 
         userGuess = null;
         betInput.value = "";
         guessButtons.forEach(btn => btn.disabled = true);
 
         if(round === maxRounds){
+            // Game finished, evaluate total outcome
+            let totalWonBets = wonBets.reduce((a,b)=>a+b,0);
+            let totalAllBets = allBets.reduce((a,b)=>a+b,0);
             let finalMsg = "";
+
             if(coinWins > computerWins){
-                points += bet; // add total bet points
-                finalMsg = `You won the game! Total points won: ${totalRoundPoints}`;
+                // user wins overall, add only bets from rounds they won
+                points += totalWonBets;
+                finalMsg = `You won the game! Points gained from your won rounds: ${totalWonBets}`;
             } else {
-                points -= bet;
+                // computer wins overall, deduct all bets
+                points -= totalAllBets;
                 if(points < 0) points = 0;
-                finalMsg = `Computer won the game. Total points lost: ${-totalRoundPoints}`;
+                finalMsg = `Computer won the game. Points deducted from all rounds: ${totalAllBets}`;
             }
+
             document.getElementById('pointsDisplay').textContent = points;
             document.getElementById('gameMessage').textContent = finalMsg;
-            document.getElementById('totalPoints').textContent = `Total points this game: ${totalRoundPoints}`;
+            document.getElementById('totalPoints').textContent = `Total points affected: ${coinWins > computerWins ? totalWonBets : totalAllBets}`;
             localStorage.setItem('points', points);
             document.getElementById('restartBtn').style.display = "block";
+
+            wonBets = [];
+            allBets = [];
         }
 
     }, 2000);
@@ -266,7 +257,8 @@ function restartGame(){
     coinWins = 0;
     computerWins = 0;
     round = 0;
-    totalRoundPoints = 0;
+    wonBets = [];
+    allBets = [];
     userGuess = null;
     bet = 0;
 
@@ -283,27 +275,8 @@ function restartGame(){
 
     document.getElementById('coinHistory').innerHTML = "";
 }
-// Update username and points anywhere on the page
-function updateUserInfo() {
-    const username = localStorage.getItem("username") || "Player1";
-    const points = localStorage.getItem("points") || 25;
-
-    document.querySelectorAll("#usernameDisplay, #usernameCenter")
-            .forEach(el => el.textContent = username);
-    document.getElementById("pointsDisplay").textContent = points;
-}
-
-setInterval(updateUserInfo, 1000);
-
-function changePoints(amount) {
-    let points = parseInt(localStorage.getItem("points") || 25);
-    points += amount;
-    if (points < 0) points = 0;
-    localStorage.setItem("points", points);
-    updateUserInfo();
-}
-
 </script>
+
 
 </body>
 </html>
