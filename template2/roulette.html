@@ -188,15 +188,10 @@ function updateUserInfo() {
 }
 setInterval(updateUserInfo, 1000);
 
-function changePoints(amount) {
-    points += amount;
-    if(points < 0) points = 0;
-    localStorage.setItem("points", points);
-    updateUserInfo();
-}
-
 // Game variables
-let userGuess = null, rouletteWins = 0, computerWins = 0, round = 0, maxRounds = 5, bet = 0, totalRoundPoints = 0;
+let userGuess = null, rouletteWins = 0, computerWins = 0, round = 0, maxRounds = 5, bet = 0;
+let wonBets = [];   // Bets the user won
+let allBets = [];   // All bets placed
 const wheel = document.getElementById("wheel");
 const guessButtons = document.querySelectorAll('.game-container button[onclick^="setGuess"]');
 const betInput = document.getElementById('betAmount');
@@ -214,11 +209,14 @@ function setGuess(g) {
     document.getElementById("rouletteResult").textContent = "You picked " + g;
 }
 
+// Spin roulette
 function spinRoulette() {
     if(!bet || bet <= 0) return alert("Enter a valid bet amount!");
     if(bet > points) return alert("Not enough points!");
     if(!userGuess) return alert("Pick an option first!");
     if(round >= maxRounds) return alert("Game over. Click Restart.");
+
+    allBets.push(bet); // Track all bets
 
     const numbers = [
         {num:0, color:"Green"},
@@ -238,22 +236,21 @@ function spinRoulette() {
     wheel.style.transform = `rotate(${finalRotation}deg)`;
 
     setTimeout(() => {
-        let pointsChange = 0;
-        let roundMsg = "";
         const isEven = result.num % 2 === 0 && result.num !== 0;
         const isOdd = result.num % 2 === 1;
         const correct = (userGuess === result.color) || (userGuess === "Even" && isEven) || (userGuess === "Odd" && isOdd);
 
+        let pointsChange = 0;
+        let roundMsg = "";
         if(correct){
             rouletteWins++;
+            wonBets.push(bet); // Track won bet
             pointsChange = bet;
-            totalRoundPoints += pointsChange;
             roundMsg = `You won this round! +${pointsChange} pts`;
             confetti({ particleCount: 90, spread: 65, origin: { y: 0.6 } });
         } else {
             computerWins++;
             pointsChange = -bet;
-            totalRoundPoints += pointsChange;
             roundMsg = `Computer won this round. -${bet} pts`;
         }
 
@@ -270,26 +267,33 @@ function spinRoulette() {
         betInput.value = "";
 
         if(round === maxRounds){
+            let totalWonBets = wonBets.reduce((a,b)=>a+b,0);
+            let totalAllBets = allBets.reduce((a,b)=>a+b,0);
             let msg = "";
+
             if(rouletteWins > computerWins){
-                points += bet;
-                msg = `You won the match! Total points won: ${totalRoundPoints}`;
+                points += totalWonBets;
+                msg = `You won the match! Points gained from rounds you won: ${totalWonBets}`;
             } else {
-                points -= bet;
+                points -= totalAllBets;
                 if(points < 0) points = 0;
-                msg = `Computer won the match. Total points lost: ${-totalRoundPoints}`;
+                msg = `Computer won the match. Points deducted from all rounds: ${totalAllBets}`;
             }
+
             document.getElementById("pointsDisplay").textContent = points;
             document.getElementById("gameMessage").textContent = msg;
-            document.getElementById("totalPoints").textContent = `Total points this game: ${totalRoundPoints}`;
+            document.getElementById("totalPoints").textContent = `Total points affected: ${rouletteWins > computerWins ? totalWonBets : totalAllBets}`;
             localStorage.setItem("points", points);
             document.getElementById("restartBtn").style.display = "block";
-        }
 
+            // Reset round-specific trackers
+            wonBets = [];
+            allBets = [];
+        }
     }, 3500);
 }
 
-// Add to history
+// Add history
 function addHistory(listId, game, result, pointsChange, userPick, computerPick){
     const li = document.createElement('li');
     const sign = pointsChange >= 0 ? "+" : "";
@@ -303,7 +307,8 @@ function restartGame() {
     rouletteWins = 0;
     computerWins = 0;
     round = 0;
-    totalRoundPoints = 0;
+    wonBets = [];
+    allBets = [];
     userGuess = null;
     bet = 0;
 
@@ -319,27 +324,6 @@ function restartGame() {
     guessButtons.forEach(btn => btn.disabled = true);
     wheel.style.transform = "rotate(0deg)";
 }
-// Update username and points anywhere on the page
-function updateUserInfo() {
-    const username = localStorage.getItem("username") || "Player1";
-    const points = localStorage.getItem("points") || 50;
-
-    document.querySelectorAll("#usernameDisplay, #usernameCenter")
-            .forEach(el => el.textContent = username);
-    document.getElementById("pointsDisplay").textContent = points;
-}
-
-setInterval(updateUserInfo, 1000);
-
-function changePoints(amount) {
-    let points = parseInt(localStorage.getItem("points") || 50);
-    points += amount;
-    if (points < 0) points = 0;
-    localStorage.setItem("points", points);
-    updateUserInfo();
-}
-</script>
-
 </script>
 </body>
 </html>
