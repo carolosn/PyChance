@@ -200,18 +200,46 @@
 
 
 
-    <script>
-    function switchCard(id) {
+  <script>
+// Clear old login info and reset top-right display on page load
+document.addEventListener("DOMContentLoaded", function() {
+    clearUserInfo();
+    clearCardInputs();
+    showCard('loginCard'); // default to login
+});
+
+// Function to clear top-right username and points
+function clearUserInfo() {
+    localStorage.removeItem('pychance_user');
+    localStorage.removeItem('points');
+    document.getElementById('username').textContent = '---';
+    document.getElementById('points').textContent = 0;
+}
+
+// Function to clear all inputs in both cards
+function clearCardInputs() {
+    const loginInputs = document.querySelectorAll('#loginCard input');
+    const registerInputs = document.querySelectorAll('#registerCard input');
+    loginInputs.forEach(input => input.value = '');
+    registerInputs.forEach(input => input.value = '');
+}
+
+// Show one card and hide the other
+function showCard(id) {
     document.getElementById("loginCard").classList.remove("active");
     document.getElementById("registerCard").classList.remove("active");
-    document.getElementById('username').textContent = localStorage.getItem('pychance_user') || '---';
-    document.getElementById('points').textContent = localStorage.getItem('points') || 0;
     document.getElementById(id).classList.add("active");
+    clearCardInputs();
+}
 
-    }
+// Switch card when clicking the switch button
+function switchCard(id) {
+    clearCardInputs();
+    showCard(id);
+}
 
 /* LOGIN FORM */
-    document.getElementById("loginForm").addEventListener("submit", function (e) {
+document.getElementById("loginForm").addEventListener("submit", function (e) {
     e.preventDefault();
 
     const username = this.username.value.trim();
@@ -234,11 +262,15 @@
     localStorage.setItem("username", username);
     localStorage.setItem("points", accounts[username].points);
 
+    // Update top-right display
+    document.getElementById('username').textContent = username;
+    document.getElementById('points').textContent = accounts[username].points;
+
     window.location.href = "homepage.html";
-    });
+});
 
 /* REGISTER FORM */
-    document.querySelector("#registerCard form").addEventListener("submit", function (e) {
+document.querySelector("#registerCard form").addEventListener("submit", function (e) {
     e.preventDefault();
 
     const username = this.username.value.trim();
@@ -263,7 +295,7 @@
         points: 50
     };
 
-    // Save accounts FIRST
+    // Save accounts
     localStorage.setItem("pychance_accounts", JSON.stringify(accounts));
 
     // Save user info
@@ -271,10 +303,13 @@
     localStorage.setItem("username", username);
     localStorage.setItem("points",  accounts[username].points);
 
+    // Update top-right display
+    document.getElementById('username').textContent = username;
+    document.getElementById('points').textContent = accounts[username].points;
 
     window.location.href = "homepage.html";
-    });
-
+});
 </script>
+
 </body>
 </html>
