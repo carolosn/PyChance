@@ -88,7 +88,27 @@ def wallet():
     # GET request
     return render_template("wallet.html", balance=balance, error=error)
 
+@app.route("/cashout", methods=["POST"])
+def cashout():
+    balance = session.get("balance", 0.0)
+    error = None
 
+    amount_str = request.form.get("amount", "0")
+
+    try:
+        amount = float(amount_str)
+    except ValueError:
+        amount = 0
+
+    if amount <= 0:
+        error = "Please enter a positive withdrawal amount."
+    elif amount > balance:
+        error = "You don't have enough funds to cash out."
+    else:
+        balance -= amount
+        session["balance"] = balance
+
+    return render_template("wallet.html", balance=balance, error=error)
 # Make balance available in all templates (for navbar, etc.)
 @app.context_processor
 def inject_balance():
