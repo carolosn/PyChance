@@ -205,10 +205,19 @@ function toggleMenu() {
   menu.style.display = menu.style.display === "flex" ? "none" : "flex";
 }
 
+// ===== NEW CONVERSION FUNCTIONS =====
+function pointsToCash(pts) {
+  return (pts * 0.0025).toFixed(2); // 100 pts = $0.25
+}
+
+function cashToPoints(cash) {
+  return Math.floor(cash * 400); // $1 = 400 points
+}
+
 function updateUI() {
   document.getElementById("pointsCurrent").textContent = points;
   document.getElementById("pointsDisplay").textContent = points;
-  document.getElementById("cashValue").textContent = (points * 10 / 100).toFixed(2); // 100 pts = $10
+  document.getElementById("cashValue").textContent = pointsToCash(points);
   renderHistory();
 }
 
@@ -232,7 +241,8 @@ function buyPoints() {
     alert("Enter a valid dollar amount.");
     return;
   }
-  const purchasedPoints = Math.floor(amount * 10); // $10 = 100 pts → 1$ = 10 pts
+
+  const purchasedPoints = cashToPoints(amount); // FIXED
   points += purchasedPoints;
   localStorage.setItem("points", points);
 
@@ -250,12 +260,14 @@ function buyPoints() {
 
 function sellPoints() {
   const sellAmount = parseInt(document.getElementById("sellPoints").value);
+
   if (!sellAmount || sellAmount < 1) return;
   if (sellAmount > points) {
     alert("You don't have that many points.");
     return;
   }
-  const cashValue = (sellAmount * 10 / 100).toFixed(2); // 100 pts = $10
+
+  const cashValue = pointsToCash(sellAmount); // FIXED
 
   points -= sellAmount;
   localStorage.setItem("points", points);
